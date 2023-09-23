@@ -14,6 +14,14 @@ resource "aws_s3_object" "output" {
   content_type           = "application/x-directory"
   server_side_encryption = "AES256"
 }
+# place kaggle data inside input
+resource "aws_s3_object" "news_dataset_object" {
+  bucket                 = aws_s3_bucket.glue_scripts_bucket.id
+  key                    = "News_Category_Dataset_v3.json"
+  source                 = data.local_file.news_dataset.filename
+  content_type           = "application/json"
+  server_side_encryption = "AES256"
+}
 # lambda bucket
 resource "aws_s3_bucket" "lambda_bucket" {
   bucket = var.lambda_bucket_name
@@ -158,9 +166,9 @@ resource "aws_cloudwatch_log_group" "glue_job_log_group" {
   name              = "glue_job_log_group"
   retention_in_days = 14
 }
-# add glue job script to s3
+# add glue job script to s3 -
 resource "aws_s3_object" "glue_script_object" {
-  bucket                 = aws_s3_bucket.news_data_bucket_is459.id
+  bucket                 = aws_s3_bucket.glue_scripts_bucket.id
   key                    = "glue_job.py"
   source                 = data.local_file.glue_job_file.filename
   content_type           = "text/x-python"

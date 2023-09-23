@@ -68,3 +68,8 @@ data "local_file" "glue_job_file" {
 }
 
 
+data "local_file" "news_dataset" {
+  filename = "../data/News_Category_Dataset_v3.json"
+}
+
+
