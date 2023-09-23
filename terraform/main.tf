@@ -16,8 +16,8 @@ resource "aws_s3_object" "output" {
 }
 # place kaggle data inside input
 resource "aws_s3_object" "news_dataset_object" {
-  bucket                 = aws_s3_bucket.glue_scripts_bucket.id
-  key                    = "News_Category_Dataset_v3.json"
+  bucket                 = aws_s3_bucket.news_data_bucket_is459.id
+  key                    = "input/News_Category_Dataset_v3.json"
   source                 = data.local_file.news_dataset.filename
   content_type           = "application/json"
   server_side_encryption = "AES256"
