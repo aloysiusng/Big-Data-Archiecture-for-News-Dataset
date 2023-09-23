@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "glue_s3_policy" {
 data "aws_iam_policy_document" "glue_policy" {
   statement {
     actions   = ["glue:*"]
-    resources = [aws_s3_bucket.news_data_bucket_is459.arn, aws_glue_catalog_database.news_database.arn.aws_glue_catalog_table.news_table.arn, aws_cloudwatch_log_group.glue_job_log_group.arn]
+    resources = [aws_s3_bucket.news_data_bucket_is459.arn, aws_glue_catalog_database.news_database.arn, aws_glue_catalog_table.news_table.arn, aws_cloudwatch_log_group.glue_job_log_group.arn]
   }
 }
 

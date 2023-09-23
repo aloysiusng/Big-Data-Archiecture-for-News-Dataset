@@ -138,25 +138,23 @@ resource "aws_iam_policy_attachment" "glue_attachment" {
   policy_arn = aws_iam_policy.glue_access.arn
 }
 # glue crawler
-resource "aws_glue_crawler" "my_crawler" {
+resource "aws_glue_crawler" "news_data_crawler" {
   name          = "news_data_crawler"
-  role          = aws_iam_role.glue_crawler_role.arn
-  database_name = aws_glue_catalog_database.my_database.name
-  targets {
-    s3_targets {
-      path = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/input/"
-    }
+  role          = aws_iam_role.glue_role.arn
+  database_name = aws_glue_catalog_database.news_database.name
+
+  s3_target {
+    path = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/input/"
   }
+
 }
 resource "aws_glue_catalog_table" "news_table" {
   name          = "news_table"
   database_name = aws_glue_catalog_database.news_database.name
-  table_input {
-    name        = "news_table"
-    description = "News Table"
-    storage_descriptor {
-      location = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/input/"
-    }
+  target_table {
+    catalog_id = aws_glue_catalog_database.news_database.catalog_id
+    database_name = aws_glue_catalog_database.news_database.name
+    name = "news_table"
   }
 }
 
