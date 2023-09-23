@@ -10,9 +10,9 @@ variable "NEWS_API_KEY" {
 }
 
 # set default values for variables
-variable "news_data_bucket_is459" {
+variable "news_data_bucket_name" {
   type    = string
-  default = "news_data_bucket_is459"
+  default = "news-data-bucket-assignment1-aloy"
 }
 variable "news_database" {
   type    = string
@@ -20,9 +20,9 @@ variable "news_database" {
 }
 variable "lambda_bucket_name" {
   type    = string
-  default = "lambda_bucket"
+  default = "lambda-bucket-assignment1-aloy"
 }
 variable "glue_scripts_bucket_name" {
   type    = string
-  default = "glue_scripts_bucket"
+  default = "glue-scripts-bucket-assignment1-aloy"
 }

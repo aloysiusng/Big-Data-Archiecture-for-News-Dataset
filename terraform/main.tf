@@ -1,6 +1,6 @@
 # S3====================================================================================================
 resource "aws_s3_bucket" "news_data_bucket_is459" {
-  bucket = var.news_data_bucket_is459
+  bucket = var.news_data_bucket_name
 }
 resource "aws_s3_object" "input" {
   bucket                 = aws_s3_bucket.news_data_bucket_is459.id
@@ -78,7 +78,7 @@ resource "aws_lambda_function" "get_news_api" {
 
   environment {
     variables = {
-      S3_BUCKET_NAME = var.news_data_bucket_is459
+      S3_BUCKET_NAME = var.news_data_bucket_name
       NEWS_API_KEY   = var.NEWS_API_KEY
     }
   }
@@ -151,11 +151,6 @@ resource "aws_glue_crawler" "news_data_crawler" {
 resource "aws_glue_catalog_table" "news_table" {
   name          = "news_table"
   database_name = aws_glue_catalog_database.news_database.name
-  target_table {
-    catalog_id = aws_glue_catalog_database.news_database.catalog_id
-    database_name = aws_glue_catalog_database.news_database.name
-    name = "news_table"
-  }
 }
 
 # glue job (TODO: need to change the script location)
