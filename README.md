@@ -3,14 +3,28 @@
 ## Fields of the dataset
 
 For each article the attribute are as follows:
-| Attribute | Description |
-|------------------- |--------------------|
-| category | Category article belongs to |
-| headline | Headline of the article |
-| authors | Person authored the article |
-| link | Link to the post |
-| short_description | Short description of the article |
-| date | Date the article was published|
+| Attribute | Attribute |Description |
+|------------------- |--------------------|--------------------|
+| category |string| category article belongs to |
+| headline |string| headline of the article |
+| authors |string| person authored the article |
+| link |string| link to the post |
+| short_description |string| short description of the article |
+| date |string| date the article was published|
+
+## Fields of supplementary data from news api
+Source: https://newsapi.org/
+For each article the attribute are as follows:
+| Attribute | Attribute | Description|
+|------------------- |--------------------| --------------------|
+|source_id	|string| id of news agency|
+|source_name	|string| name of news agency|
+|author	|string| author of article|
+|title	|string| title of article|
+|description	|string| description of article|
+|url	|string| url to article|
+|urltoimage	|string| url to image|
+|publishedat	|string| when was the article published|
 
 ## Business question 1:
 
