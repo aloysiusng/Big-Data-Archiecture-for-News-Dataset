@@ -25,3 +25,10 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# ignore dependency files
+**/node_modules/*
+lambda/**/*.zip
+**/.DS_Store
+
+**/archive/*

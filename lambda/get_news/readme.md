@@ -1,3 +1,4 @@
+# continuation with paid API key
 due to the free API Key limitations, we can only fetch up to 100 articles at a time
 <br/>
 search for `<insertion>` in `get_news.py` and add some logic to go down the pages and fetch more articles

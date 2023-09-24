@@ -1,0 +1,9 @@
+{
+  "name": "lambda-news-api",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for fetching news data",
+  "main": "index.js", 
+  "dependencies": {
+    "axios": "^0.24.0"  
+  }
+}

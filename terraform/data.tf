@@ -1,4 +1,4 @@
-# lambda
+# lambda --------------------------------------------------------------------------------------------------
 data "aws_iam_policy_document" "lambda_role_assume_role_policy" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "lambda_role_assume_role_policy" {
 data "aws_iam_policy_document" "lambda_s3_policy" {
   statement {
     actions   = ["s3:*", "s3-object-lambda:*"]
-    resources = [aws_s3_bucket.news_data_bucket_is459.arn]
+    resources = [aws_s3_bucket.news_data_bucket_is459.arn, "${aws_s3_bucket.news_data_bucket_is459.arn}/input/*", "${aws_s3_bucket.news_data_bucket_is459.arn}/output/*"]
   }
 }
 
@@ -32,11 +32,11 @@ data "aws_iam_policy_document" "lambda_policy" {
 
 data "archive_file" "get_news_zip" {
   type        = "zip"
-  source_dir  = "..//lambda/get_news"
+  source_dir  = "../lambda/get_news"
   output_path = "../lambda/get_news.zip"
 }
 
-# glue
+# glue ----------------------------------------------------------------------------------------------------
 data "aws_iam_policy_document" "glue_role_assume_role_policy" {
   statement {
     actions = ["sts:AssumeRole"]
