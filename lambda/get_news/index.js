@@ -96,13 +96,37 @@ exports.handler = async (event, context) => {
       body: `Failed to fetch any news data from News API /v2/everything. Status code: ${topHeadlinesResponse.status}`,
     };
   }
+  // pre-process topHeadlinesToS3
+  var topHeadlinesToS3String = "";
+
+  // Iterate through the array and transform each article
+  topHeadlinesToS3.forEach((articleGroup) => {
+    articleGroup.forEach((article) => {
+      // Create a new object for the transformed article
+      const flattenedArticle = {
+        source_id: article.source.id,
+        source_name: article.source.name,
+        author: article.author,
+        title: article.title,
+        description: article.description,
+        url: article.url,
+        urlToImage: article.urlToImage,
+        publishedAt: article.publishedAt,
+        content: article.content,
+      };
+
+      // Push the transformed article to the array
+      topHeadlinesToS3String += JSON.stringify(flattenedArticle);
+    });
+  });
+
   let s3PutResponse;
   try {
     s3PutResponse = await s3
       .putObject({
         Bucket: "news-data-bucket-assignment1-aloy/input",
         Key: "news_data.json",
-        Body: JSON.stringify(topHeadlinesToS3),
+        Body: topHeadlinesToS3String,
         ContentType: "application/json",
       })
       .promise();
