@@ -50,8 +50,8 @@ data "aws_iam_policy_document" "glue_role_assume_role_policy" {
 
 data "aws_iam_policy_document" "glue_s3_policy" {
   statement {
-    actions   = ["s3:ListBucket", "s3:GetBucketLocation", "s3:GetObject", "s3:PutObject"]
-    resources = ["${aws_s3_bucket.news_data_bucket_is459.arn}/input/*", "${aws_s3_bucket.news_data_bucket_is459.arn}/output/*"]
+    actions   = ["s3:*"]
+    resources = [aws_s3_bucket.news_data_bucket_is459.arn, "${aws_s3_bucket.news_data_bucket_is459.arn}/*"]
   }
 }
 
@@ -64,7 +64,7 @@ data "aws_iam_policy_document" "glue_policy" {
       "${aws_s3_bucket.news_data_bucket_is459.arn}/output/*",
       aws_glue_catalog_database.news_database.arn,
       aws_cloudwatch_log_group.glue_job_log_group.arn,
-      "arn:aws:glue:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:table/${var.news_database}/*}",
+      "arn:aws:glue:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:table/${var.news_database}/*",
       "arn:aws:glue:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:catalog"
     ]
   }
