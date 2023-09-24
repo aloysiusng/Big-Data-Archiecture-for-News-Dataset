@@ -39,6 +39,8 @@ For each article the attribute are as follows:
 AWS_ACCESS_KEY_ID     = "your_aws_access_key_id"
 AWS_SECRET_ACCESS_KEY = "your_aws_secret_access_key"
 NEWS_API_KEY          = "your_news_api_key"
+AWS_ACCOUNT_ID        = "your_aws_account_id"
+AWS_REGION            = "your_aws_region"
 ```
 
 - :memo: **Note:** the news api key can be retrieved from https://newsapi.org/

@@ -8,6 +8,12 @@ variable "AWS_SECRET_ACCESS_KEY" {
 variable "NEWS_API_KEY" {
   type = string
 }
+variable "AWS_ACCOUNT_ID" {
+  type = string
+}
+variable "AWS_REGION" {
+  type = string
+}
 
 # set default values for variables
 variable "news_data_bucket_name" {

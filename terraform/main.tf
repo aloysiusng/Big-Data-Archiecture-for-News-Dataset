@@ -3,19 +3,19 @@ resource "aws_s3_bucket" "news_data_bucket_is459" {
   bucket = var.news_data_bucket_name
 }
 resource "aws_s3_object" "input" {
-  bucket                 = aws_s3_bucket.news_data_bucket_is459.id
-  key                    = "input/"
+  bucket = aws_s3_bucket.news_data_bucket_is459.id
+  key    = "input/"
 }
 resource "aws_s3_object" "output" {
-  bucket                 = aws_s3_bucket.news_data_bucket_is459.id
-  key                    = "output/"
+  bucket = aws_s3_bucket.news_data_bucket_is459.id
+  key    = "output/"
 }
 # place kaggle data inside input
 resource "aws_s3_object" "news_dataset_object" {
-  bucket                 = aws_s3_bucket.news_data_bucket_is459.id
-  key                    = "input/News_Category_Dataset_v3.json"
-  source                 = data.local_file.news_dataset.filename
-  content_type           = "application/json"
+  bucket       = aws_s3_bucket.news_data_bucket_is459.id
+  key          = "input/News_Category_Dataset_v3.json"
+  source       = data.local_file.news_dataset.filename
+  content_type = "application/json"
 }
 # lambda bucket
 resource "aws_s3_bucket" "lambda_bucket" {
@@ -68,7 +68,7 @@ module "attach_policies_policies" {
     data.aws_iam_policy_document.glue_s3_policy.json,
   ]
 }
-resource "aws_iam_policy" "cloudwatch_access_policy"{
+resource "aws_iam_policy" "cloudwatch_access_policy" {
   name        = "cloudwatch-access-policy"
   description = "Policy for cloudwatch access"
   policy      = data.aws_iam_policy_document.cloudwatch_policy.json
@@ -149,16 +149,15 @@ resource "aws_glue_crawler" "news_data_crawler" {
   name          = "news_data_crawler"
   role          = aws_iam_role.glue_role.arn
   database_name = aws_glue_catalog_database.news_database.name
-
+  schedule      = "cron(30 0 * * ? *)" // Daily at 12:30 AM UTC
   s3_target {
-    path = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/input/"
+    path = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/input"
   }
 
 }
-resource "aws_glue_trigger" "news_data_crawler_trigger" {
-  name         = "news-data-crawler-trigger"
-  type         = "SCHEDULED"
-  schedule     = "cron(30 0 * * ? *)"  // Daily at 12:30 AM UTC
+resource "aws_glue_trigger" "news_data_crawler_on_demand_trigger" {
+  name = "news-data-crawler-on-demand-trigger"
+  type = "ON_DEMAND"
   actions {
     crawler_name = aws_glue_crawler.news_data_crawler.name
   }
@@ -198,8 +197,21 @@ resource "aws_glue_job" "glue_etl_job" {
     "--enable-metrics"                   = ""
   }
 }
-
-
+resource "aws_glue_trigger" "news_data_etl_on_demand_trigger" {
+  name = "news-data-etl-on-demand-trigger"
+  type = "ON_DEMAND"
+  actions {
+    job_name = aws_glue_job.glue_etl_job.name
+  }
+}
+resource "aws_glue_trigger" "news_data_etl_scheduled_trigger" {
+  name     = "news-data-etl-scheduled-trigger"
+  type     = "SCHEDULED"
+  schedule = "cron(30 0 * * ? *)" // Daily at 12:30 AM UTC
+  actions {
+    job_name = aws_glue_job.glue_etl_job.name
+  }
+}
 
 # resource "aws_quicksight_data_source" "my_data_source" {
 #   name = "my-data-source"
