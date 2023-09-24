@@ -1,3 +1,6 @@
+# Before terraform apply
+please `npm install` in this directory
+
 # continuation with paid API key
 due to the free API Key limitations, we can only fetch up to 100 articles at a time
 <br/>

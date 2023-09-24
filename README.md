@@ -32,7 +32,8 @@ For each article the attribute are as follows:
 ## How to set up the project
 
 1. Clone the repository
-2. Under the terraform directory, place the terraform.tfvars file with the following content:
+2. Under lambda/get_news directory, run `npm install`
+3. Under the terraform directory, place the terraform.tfvars file with the following content:
 
 ```
 AWS_ACCESS_KEY_ID     = "your_aws_access_key_id"
