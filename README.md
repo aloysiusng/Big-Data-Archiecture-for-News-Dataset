@@ -55,6 +55,10 @@ terraform apply
 4. Once the terraform is applied, the architecture will be created in AWS.
    ![alt text](image.jpg)
 
+**For the scheduled triggers:**
+- 1200 daily => lambda get_news
+- 1220 daily => glue crawler
+- 1240 daily => glue ETL job
 ---
 
 **Citation of data sources:**
