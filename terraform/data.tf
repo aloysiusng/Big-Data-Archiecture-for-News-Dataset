@@ -58,22 +58,25 @@ data "aws_iam_policy_document" "glue_s3_policy" {
 
 data "aws_iam_policy_document" "glue_policy" {
   statement {
-    actions = ["glue:*"]
+    actions = ["glue:*", "athena:*"]
     resources = [
       "${aws_s3_bucket.news_data_bucket_is459.arn}/input/*",
       "${aws_s3_bucket.news_data_bucket_is459.arn}/output/*",
       aws_glue_catalog_database.news_database.arn,
-      aws_cloudwatch_log_group.glue_job_log_group.arn,
+      "arn:aws:logs:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:*",
       "arn:aws:glue:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:table/${var.news_database}/*",
       "arn:aws:glue:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:catalog"
     ]
   }
 }
 
-data "local_file" "glue_job_file" {
-  filename = "../glue/glue_job.py"
+data "local_file" "merge_data_source_job_py_file" {
+  filename = "../glue/merge_data_source_job.py"
 }
 
+data "local_file" "articles_by_agencies_etl_job_py_file" {
+  filename = "../glue/articles_by_agencies_etl_job.py"
+}
 
 data "local_file" "news_dataset" {
   filename = "../data/News_Category_Dataset_v3.json"

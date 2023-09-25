@@ -168,53 +168,48 @@ resource "aws_glue_catalog_table" "news_table" {
   database_name = aws_glue_catalog_database.news_database.name
 }
 
-# glue job (TODO: need to change the script location)
-resource "aws_cloudwatch_log_group" "glue_job_log_group" {
-  name              = "glue_job_log_group"
-  retention_in_days = 14
+# glue jobs for etl ============ **saves to both s3 and glue catalog ========================================================================================
+# saves to news_database.articles_by_agencies and to s3://news-data-bucket-assignment1-aloy/output/articles_by_agencies/
+module "articles_by_agencies_etl_job" {
+  source          = "./glue_jobs"
+  job_name        = "articles_by_agencies_etl_job"
+  script_location = data.local_file.articles_by_agencies_etl_job_py_file.filename
+  s3_bucket_id    = aws_s3_bucket.glue_scripts_bucket.id
+  iam_role_arn    = aws_iam_role.glue_role.arn
+
 }
-# add glue job script to s3 -
-resource "aws_s3_object" "glue_script_object" {
-  bucket                 = aws_s3_bucket.glue_scripts_bucket.id
-  key                    = "glue_job.py"
-  source                 = data.local_file.glue_job_file.filename
-  content_type           = "text/x-python"
-  server_side_encryption = "AES256"
+
+module "merge_data_source_job" {
+  source          = "./glue_jobs"
+  job_name        = "merge_data_source_job"
+  script_location = data.local_file.merge_data_source_job_py_file.filename
+  s3_bucket_id    = aws_s3_bucket.glue_scripts_bucket.id
+  iam_role_arn    = aws_iam_role.glue_role.arn
 }
-resource "aws_glue_job" "glue_etl_job" {
-  name     = "glue-etl-job"
-  role_arn = aws_iam_role.glue_role.arn
-  command {
-    name            = "glueetl"
-    python_version  = "3"
-    script_location = "s3://${aws_s3_bucket.glue_scripts_bucket.id}/glue_job.py"
-  }
-  default_arguments = {
-    "--job-language"                     = "python"
-    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.glue_job_log_group.name
-    "--enable-continuous-cloudwatch-log" = "true"
-    "--enable-continuous-log-filter"     = "true"
-    "--enable-metrics"                   = ""
-  }
-}
-resource "aws_glue_trigger" "news_data_etl_on_demand_trigger" {
-  name = "news-data-etl-on-demand-trigger"
-  type = "ON_DEMAND"
-  actions {
-    job_name = aws_glue_job.glue_etl_job.name
-  }
-}
-resource "aws_glue_trigger" "news_data_etl_scheduled_trigger" {
-  name     = "news-data-etl-scheduled-trigger"
-  type     = "SCHEDULED"
-  schedule = "cron(40 0 * * ? *)" // Daily at 12:30 AM UTC
-  actions {
-    job_name = aws_glue_job.glue_etl_job.name
+
+# Athena====================================================================================================
+resource "aws_athena_workgroup" "athena_workgroup" {
+  name = var.athena_workgroup_name
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+    result_configuration {
+      output_location = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/output/articles_by_agencies/"
+    }
   }
 }
 
-# resource "aws_quicksight_data_source" "my_data_source" {
-#   name = "my-data-source"
+# athena query for articles by agencies 
+resource "aws_athena_named_query" "articles_by_agencies_query" {
+  name      = "articles_by_agencies_query"
+  workgroup = aws_athena_workgroup.athena_workgroup.id
+  database  = aws_glue_catalog_database.news_database.name
+  query     = "SELECT publication_year, source_name, COUNT(*) as article_count FROM ${var.articles_by_agencies_table_name} GROUP BY publication_year, source_name ORDER BY publication_year, source_name;"
+}
+
+# quicksight====================================================================================================
+# resource "aws_quicksight_data_source" "quicksight_data_source" {
+#   name = var.quicksight_data_source_name
 #   type = "ATHENA"
 #   athena_parameters {
 #     work_group = "my-athena-workgroup"
