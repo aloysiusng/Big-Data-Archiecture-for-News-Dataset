@@ -11,8 +11,9 @@ resource "aws_s3_object" "s3_merge_data_source_job" {
   server_side_encryption = "AES256"
 }
 resource "aws_glue_job" "merge_data_source_job" {
-  name     = var.job_name
-  role_arn = var.iam_role_arn
+  name         = var.job_name
+  role_arn     = var.iam_role_arn
+  glue_version = "4.0"
   command {
     name            = "glueetl"
     python_version  = "3"
