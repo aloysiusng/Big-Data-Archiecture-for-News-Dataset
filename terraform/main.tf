@@ -18,9 +18,9 @@ resource "aws_s3_object" "news_dataset_object" {
   content_type = "application/json"
 }
 # lambda bucket
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = var.lambda_bucket_name
-}
+# resource "aws_s3_bucket" "lambda_bucket" {
+#   bucket = var.lambda_bucket_name
+# }
 # glue script bucket
 resource "aws_s3_bucket" "glue_scripts_bucket" {
   bucket = var.glue_scripts_bucket_name
@@ -163,9 +163,44 @@ resource "aws_glue_trigger" "news_data_crawler_on_demand_trigger" {
   }
 }
 
-resource "aws_glue_catalog_table" "news_table" {
-  name          = "news_table"
+resource "aws_glue_catalog_table" "combined_news_table" {
+  name          = "combined_news_table"
   database_name = aws_glue_catalog_database.news_database.name
+  table_type    = "EXTERNAL_TABLE"
+
+  parameters = {
+    EXTERNAL              = "TRUE"
+    "parquet.compression" = "SNAPPY"
+  }
+  storage_descriptor {
+    # location      = "s3://news-data-bucket-assignment1-aloy/outputs/articles_by_agencies/"
+    location      = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/output/articles_by_agencies/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "combined_news"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+      parameters = {
+        "serialization.format" = 1
+      }
+    }
+    columns {
+      name = "source_name"
+      type = "string"
+    }
+
+    columns {
+      name = "publication_year"
+      type = "int"
+    }
+
+    columns {
+      name = "article_count"
+      type = "int"
+    }
+  }
 }
 
 # glue jobs for etl ============ **saves to both s3 and glue catalog ========================================================================================
@@ -179,13 +214,13 @@ module "articles_by_agencies_etl_job" {
 
 }
 
-module "merge_data_source_job" {
-  source          = "./glue_jobs"
-  job_name        = "merge_data_source_job"
-  script_location = data.local_file.merge_data_source_job_py_file.filename
-  s3_bucket_id    = aws_s3_bucket.glue_scripts_bucket.id
-  iam_role_arn    = aws_iam_role.glue_role.arn
-}
+# module "merge_data_source_job" {
+#   source          = "./glue_jobs"
+#   job_name        = "merge_data_source_job"
+#   script_location = data.local_file.merge_data_source_job_py_file.filename
+#   s3_bucket_id    = aws_s3_bucket.glue_scripts_bucket.id
+#   iam_role_arn    = aws_iam_role.glue_role.arn
+# }
 
 # Athena====================================================================================================
 resource "aws_athena_workgroup" "athena_workgroup" {
@@ -194,17 +229,17 @@ resource "aws_athena_workgroup" "athena_workgroup" {
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
     result_configuration {
-      output_location = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/output/articles_by_agencies/"
+      output_location = "s3://${aws_s3_bucket.news_data_bucket_is459.bucket}/athena/output/articles_by_agencies/"
     }
   }
 }
 
-# athena query for articles by agencies 
+# athena query for articles by agencies  ->  ETL job already settled the aggregation
 resource "aws_athena_named_query" "articles_by_agencies_query" {
   name      = "articles_by_agencies_query"
   workgroup = aws_athena_workgroup.athena_workgroup.id
   database  = aws_glue_catalog_database.news_database.name
-  query     = "SELECT publication_year, source_name, COUNT(*) as article_count FROM ${var.articles_by_agencies_table_name} GROUP BY publication_year, source_name ORDER BY publication_year, source_name;"
+  query     = "SELECT * FROM combined_news_table;"
 }
 
 # quicksight====================================================================================================

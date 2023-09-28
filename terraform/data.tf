@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "glue_role_assume_role_policy" {
 data "aws_iam_policy_document" "glue_s3_policy" {
   statement {
     actions   = ["s3:*"]
-    resources = [aws_s3_bucket.news_data_bucket_is459.arn, "${aws_s3_bucket.news_data_bucket_is459.arn}/*", aws_s3_bucket.glue_scripts_bucket.arn,"${aws_s3_bucket.glue_scripts_bucket.arn}/*"]
+    resources = [aws_s3_bucket.news_data_bucket_is459.arn, "${aws_s3_bucket.news_data_bucket_is459.arn}/*", aws_s3_bucket.glue_scripts_bucket.arn, "${aws_s3_bucket.glue_scripts_bucket.arn}/*"]
   }
 }
 

@@ -20,6 +20,7 @@ job.init(args["JOB_NAME"], args)
 news_database = "news_database"
 kaggle_tbl = "news_category_dataset_v3_json"
 news_tbl = "news_data_json"
+output_table_name = "combined_news_table"
 output_s3_uri = "s3://news-data-bucket-assignment1-aloy/output/articles_by_agencies"
 
 # Create dynamic frames from the Glue tables
@@ -52,19 +53,18 @@ agg_data = combined_df.groupBy("source_name", "publication_year").agg(
 )
 agg_data = agg_data.orderBy(desc("publication_year"))
 # LOAD (WRITE DATA)
-agg_data = agg_data.repartition(2)
+agg_data = agg_data.repartition(1)
 
 # convert back to dynamic frame
 agg_data_dynamic_frame_write = DynamicFrame.fromDF(
     agg_data, glueContext, "agg_data_dynamic_frame_write"
 )
 
-glueContext.write_dynamic_frame.from_options(
+glueContext.write_dynamic_frame.from_catalog(
     frame=agg_data_dynamic_frame_write,
-    connection_type="s3",
-    connection_options={"path": output_s3_uri},
-    format="csv",
+    database=news_database,
+    table_name=output_table_name,
+    format="parquet",  # Specify the format as Parquet
 )
-
 
 job.commit()

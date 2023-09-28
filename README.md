@@ -13,33 +13,37 @@ For each article the attribute are as follows:
 | date |string| date the article was published|
 
 ## Fields of supplementary data from news api
+
 Source: https://newsapi.org/
 For each article the attribute are as follows:
 | Attribute | Attribute | Description|
 |------------------- |--------------------| --------------------|
-|source_id	|string| id of news agency|
-|source_name	|string| name of news agency|
-|author	|string| author of article|
-|title	|string| title of article|
-|description	|string| description of article|
-|url	|string| url to article|
-|urltoimage	|string| url to image|
-|publishedat	|string| when was the article published|
+|source_id |string| id of news agency|
+|source_name |string| name of news agency|
+|author |string| author of article|
+|title |string| title of article|
+|description |string| description of article|
+|url |string| url to article|
+|urltoimage |string| url to image|
+|publishedat |string| when was the article published|
 
 ## Business question 1:
 
-**Business Question:** Can we visualize the number of articles produced each year by various news agencies?<br/>
-**Target beneficiary:** News Agencies
+**Business Question:** Can we visualise the distribution of the top 5 categories of articles by year in HuffPost? <br/>
+**Target beneficiary:** HuffPost
+**How does it help?** This helps HuffPost to understand the trend of the top 5 categories of articles by year. This can help them to focus on the categories that are trending and produce more articles on those categories.
 
 ## Business question 2:
 
-**Business Question:** Can we aggregate all past news articles that are valid and create a search engine? <br/>
-**Target beneficiary:** Researchers / General public
+**Business Question:** Can we visualize the number of articles produced each year by various news agencies?<br/>
+**Target beneficiary:** News Agencies
+**How does it help?** This helps news agencies to understand the trend of the number of articles produced each year. This can help them to focus on the years that have the highest number of articles produced and produce more articles in those years.
 
 ## Business question 3:
 
 **Business Question:** Can we have recommendations for categorizing articles? <br/>
 **Target beneficiary:** Article authors
+**How does it help?** This helps article authors to understand the category of the article they are writing. This can help them to focus on the categories that are trending and produce more articles on those categories.
 
 ---
 
@@ -70,9 +74,11 @@ terraform apply
    ![alt text](image.jpg)
 
 **For the scheduled triggers:**
+
 - 1200 daily => lambda get_news
 - 1220 daily => glue crawler
 - 1240 daily => glue ETL job
+
 ---
 
 **Citation of data sources:**
