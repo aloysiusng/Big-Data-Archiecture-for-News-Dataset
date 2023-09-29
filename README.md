@@ -1,5 +1,28 @@
 # Solving business questions with news category data set
 
+## [News Data Set from Kaggle](https://www.kaggle.com/datasets/rmisra/news-category-dataset)
+
+## Business question 1:
+
+**Business Question:** Can we visualize the distribution of the top 5 categories of articles by year in HuffPost? <br/>
+**Target beneficiary:** HuffPost<br/>
+**How does it help?** This helps HuffPost to understand the trend of the top 5 categories of articles by year.
+This can help them to focus on the categories that are trending and produce more articles on those categories.
+
+## Business question 2:
+
+**Business Question:** Can we visualize the number of articles produced each year by various news agencies?<br/>
+**Target beneficiary:** News Agencies<br/>
+**How does it help?** This helps news agencies to understand the trend of the number of articles produced each year.
+This can help them to focus on the years that have the highest number of articles produced and produce more articles in those years.
+
+## Business question 3:
+
+**Business Question:** Can we identify what words are commonly used for headlines? <br/>
+**Target beneficiary:** Article authors<br/>
+**How does it help?** This helps article authors to understand what words are commonly used for headlines.
+This can help them to spend less time thinking of a great headline and spend more time refining their article.
+
 ## Fields of the dataset
 
 For each article the attribute are as follows:
@@ -27,27 +50,6 @@ For each article the attribute are as follows:
 |urltoimage |string| url to image|
 |publishedat |string| when was the article published|
 
-## Business question 1:
-
-**Business Question:** Can we visualize the distribution of the top 5 categories of articles by year in HuffPost? <br/>
-**Target beneficiary:** HuffPost<br/>
-**How does it help?** This helps HuffPost to understand the trend of the top 5 categories of articles by year.
-This can help them to focus on the categories that are trending and produce more articles on those categories.
-
-## Business question 2:
-
-**Business Question:** Can we visualize the number of articles produced each year by various news agencies?<br/>
-**Target beneficiary:** News Agencies<br/>
-**How does it help?** This helps news agencies to understand the trend of the number of articles produced each year.
-This can help them to focus on the years that have the highest number of articles produced and produce more articles in those years.
-
-## Business question 3:
-
-**Business Question:** Can we identify what words are commonly used for headlines? <br/>
-**Target beneficiary:** Article authors<br/>
-**How does it help?** This helps article authors to understand what words are commonly used for headlines.
-This can help them to spend less time thinking of a great headline and spend more time refining their article.
-
 ---
 
 ## Repository Orientation
@@ -67,8 +69,15 @@ This can help them to spend less time thinking of a great headline and spend mor
   - contains the terraform code for the architecture
 - **visualizations folder**
   - contains the manifest file for the visualizations on QuickSight
+  - contains the example visualizations on QuickSight
 
 ---
+
+## Pre-requisites
+
+1. [AWS account](https://portal.aws.amazon.com/billing/signup?refid=em_127222&redirect_url=https%3A%2F%2Faws.amazon.com%2Fregistration-confirmation#/start/email)
+2. [Terraform CLI](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+3. [News API key](https://newsapi.org/register)
 
 ## How to set up the project
 
@@ -98,7 +107,13 @@ terraform apply
    The pipelines are linked to the business questions.
    ![AWS Architecture for all pipelines](data/Architecture_for_all_pipelines.png)
 
-5. To tear down the architecture, run the following command:
+5. After provisioning the architecture, you can immediately head to AWS Glue to run the crawler and ETL job.
+
+6. Thereafter, you can head to AWS Athena to run the saved queries
+
+7. Examples of QuickSight visualizations are also available in the visualizations folder
+
+8. To tear down the architecture, run the following command:
 
 ```
 cd terraform
@@ -106,6 +121,9 @@ terraform destroy
 ```
 
 ### Other Details
+
+**Cost:**
+Do note that there might be costs incurred for the AWS services used in this project.
 
 **Data Ingestion:**
 Batch (AWS Lambda)
@@ -127,13 +145,16 @@ Will require a paid subscription to News API to get more data -> code prepared i
 
 ### Points for improvement
 
-Suboptimal data ingestion of Kaggle Data Set through:
+- Suboptimal data ingestion of Kaggle Data Set through 2 ways:
 
-1. Manual downloading of Kaggle dataset and uploading to S3
-2. Manual downloading of Kaggle dataset, replacing it in the code base and run `terraform apply`
+  1.  Manual downloading of Kaggle dataset and uploading to S3
+  2.  Manual downloading of Kaggle dataset, replacing it in the code base and run `terraform apply`
 
 **Improvement:**
 Using EC2 or a Lambda function to automate this process in the future
+
+- Modularising pipelines in Terraform instead of having one big file
+  - Some modularisation is done for IAM and ETL jobs, but segregating the pipelines into different files will be better
 
 ---
 
