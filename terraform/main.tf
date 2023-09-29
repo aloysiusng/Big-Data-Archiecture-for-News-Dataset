@@ -243,5 +243,5 @@ resource "aws_athena_named_query" "top5_huff_post_articles_query" {
   name      = "top5_huff_post_articles_query"
   workgroup = aws_athena_workgroup.huff_post_articles_nathena_workgroup.id
   database  = aws_glue_catalog_database.news_database.name
-  query     = "SELECT EXTRACT(YEAR FROM date) AS publication_year, category, COUNT(*) AS article_count FROM news_category_dataset_v3_json WHERE EXTRACT(YEAR FROM date) IS NOT NULL GROUP BY EXTRACT(YEAR FROM date), category ORDER BY publication_year DESC, article_count DESC LIMIT 5;"
+  query     = "SELECT EXTRACT(YEAR FROM date) AS publication_year, category, COUNT(*) AS article_count FROM news_category_dataset_v3_json WHERE EXTRACT(YEAR FROM date) IS NOT NULL GROUP BY EXTRACT(YEAR FROM date), category ORDER BY publication_year DESC, article_count DESC;"
 }

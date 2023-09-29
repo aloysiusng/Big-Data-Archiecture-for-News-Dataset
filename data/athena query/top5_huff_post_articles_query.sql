@@ -12,4 +12,4 @@ GROUP BY
 ORDER BY
   publication_year DESC,
   article_count DESC
-LIMIT 5;
+;

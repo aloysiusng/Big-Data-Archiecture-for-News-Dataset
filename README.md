@@ -30,19 +30,19 @@ For each article the attribute are as follows:
 ## Business question 1:
 
 **Business Question:** Can we visualise the distribution of the top 5 categories of articles by year in HuffPost? <br/>
-**Target beneficiary:** HuffPost
+**Target beneficiary:** HuffPost<br/>
 **How does it help?** This helps HuffPost to understand the trend of the top 5 categories of articles by year. This can help them to focus on the categories that are trending and produce more articles on those categories.
 
 ## Business question 2:
 
 **Business Question:** Can we visualize the number of articles produced each year by various news agencies?<br/>
-**Target beneficiary:** News Agencies
+**Target beneficiary:** News Agencies<br/>
 **How does it help?** This helps news agencies to understand the trend of the number of articles produced each year. This can help them to focus on the years that have the highest number of articles produced and produce more articles in those years.
 
 ## Business question 3:
 
 **Business Question:** Can we identify what words are commonly used for headlines based on categories? <br/>
-**Target beneficiary:** Article authors
+**Target beneficiary:** Article authors<br/>
 **How does it help?** This helps article authors to understand what words are commonly used for headlines. This can help them to focus on the words that are commonly used for headlines based on categories and produce more articles with those words.
 
 ---

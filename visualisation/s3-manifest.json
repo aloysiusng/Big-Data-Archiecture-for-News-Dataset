@@ -1,7 +1,7 @@
 {
   "fileLocations": [
     {
-      "URIs": ["s3_uri"]
+      "URIs": ["s3://news-data-bucket-assignment1-aloy/athena/output/huff_post_articles/b75a9480-e393-41b6-8ecc-721542a11dd6.csv"]
     }
   ],
   "globalUploadSettings": {
