@@ -214,13 +214,13 @@ module "articles_by_agencies_etl_job" {
 
 }
 
-# module "merge_data_source_job" {
-#   source          = "./glue_jobs"
-#   job_name        = "merge_data_source_job"
-#   script_location = data.local_file.merge_data_source_job_py_file.filename
-#   s3_bucket_id    = aws_s3_bucket.glue_scripts_bucket.id
-#   iam_role_arn    = aws_iam_role.glue_role.arn
-# }
+module "merge_data_source_job" {
+  source          = "./glue_jobs"
+  job_name        = "merge_data_source_job"
+  script_location = data.local_file.merge_data_source_job_py_file.filename
+  s3_bucket_id    = aws_s3_bucket.glue_scripts_bucket.id
+  iam_role_arn    = aws_iam_role.glue_role.arn
+}
 
 # Athena====================================================================================================
 resource "aws_athena_workgroup" "articles_by_agencies_athena_workgroup" {

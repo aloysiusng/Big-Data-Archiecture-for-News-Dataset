@@ -1,70 +1,83 @@
 import sys
 
 from awsglue.context import GlueContext
+from awsglue.dynamicframe import DynamicFrame
 from awsglue.job import Job
-from awsglue.transforms import ApplyMapping
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
-from pyspark.sql import SparkSession
+from pyspark.sql.functions import count, desc, lit, month, year
 
-# Initialize the Spark session
-sc = SparkContext()
-spark = SparkSession(sc)
-glueContext = GlueContext(sc)
+## @params: [JOB_NAME]
+args = getResolvedOptions(sys.argv, ["JOB_NAME"])
 
-# Create a Job
+# Initialize contexts and session
+glueContext = GlueContext(SparkContext.getOrCreate())
+spark = glueContext.spark_session
 job = Job(glueContext)
-job.init(sys.argv[0], args=sys.argv[1:])
+job.init(args["JOB_NAME"], args)
 
-# Define the Glue database and table names
-db_name = "news_database"
-table1_name = "news_category_dataset_v3_json"
-table2_name = "news_data_json"
-merged_table_name = "news_table"
+news_database = "news_database"
+kaggle_tbl = "news_category_dataset_v3_json"
+news_tbl = "news_data_json"
+output_table_name = "combined_news_table_v2"
+output_s3_uri = "s3://news-data-bucket-assignment1-aloy/output/articles_by_agencies"
 
-# Create DynamicFrames for the two source tables
-df1 = glueContext.create_dynamic_frame.from_catalog(
-    database=db_name, table_name=table1_name
+# Create dynamic frames from the Glue tables
+kaggle_news_data = glueContext.create_dynamic_frame.from_catalog(
+    database=news_database, table_name=kaggle_tbl
 )
-df2 = glueContext.create_dynamic_frame.from_catalog(
-    database=db_name, table_name=table2_name
+news_data = glueContext.create_dynamic_frame.from_catalog(
+    database=news_database, table_name=news_tbl
 )
 
-# Apply mapping to add a "source" field to each DynamicFrame
-mapping = [
-    ("category", "string", "category", "string"),
-    ("headline", "string", "headline", "string"),
-    ("authors", "string", "authors", "string"),
-    ("link", "string", "link", "string"),
-    ("short_description", "string", "short_description", "string"),
-    ("date", "string", "date", "string"),
-    ("source_id", "string", "source_id", "string"),
-    ("source_name", "string", "source_name", "string"),
-    ("author", "string", "author", "string"),
-    ("title", "string", "title", "string"),
-    ("description", "string", "description", "string"),
-    ("url", "string", "url", "string"),
-    ("urltoimage", "string", "urltoimage", "string"),
-    ("publishedat", "string", "publishedat", "string"),
-    (lambda x: "category", "string", "source", "string")
-    (lambda x: "data", "string", "source", "string")
-]
+kaggle_news_df = kaggle_news_data.toDF()
+news_df = news_data.toDF()
 
-df1 = ApplyMapping.apply(frame=df1, mappings=mapping)
-df2 = ApplyMapping.apply(frame=df2, mappings=mapping)
+# Select only the columns we need
+kaggle_news_df = kaggle_news_df.withColumn("source_name", lit("HuffPost"))
+kaggle_news_df = kaggle_news_df.withColumn("publication_year", year("date"))
+kaggle_news_df = kaggle_news_df.withColumn("publication_month", month("date"))
+kaggle_news_df = kaggle_news_df.withColumn("title", "headline")
+kaggle_news_df = kaggle_news_df.withColumn("description", "short_description")
+cleaned_kaggle_news_df = kaggle_news_df.select(
+    "source_name",
+    "publication_year",
+    "publication_month",
+    "authors",
+    "title",
+    "description",
+)
 
-# Merge the DynamicFrames
-merged_df = df1.union(df2)
+news_df = news_df.withColumn("publication_year", year("publishedat"))
+kaggle_news_df = kaggle_news_df.withColumn("publication_month", month("publishedat"))
 
-# Write the merged DynamicFrame to a new Glue table
+news_df = news_df.withColumn("authors", "author")
+
+cleaned_news_df = news_df.select(
+    "source_name",
+    "publication_year",
+    "publication_month",
+    "authors",
+    "title",
+    "description",
+)
+
+# Union the two dataframes
+combined_df = cleaned_news_df.union(cleaned_kaggle_news_df)
+
+combined_df = combined_df.repartition(1)
+
+# convert back to dynamic frame
+combined_data_dynamic_frame_write = DynamicFrame.fromDF(
+    combined_df, glueContext, "combined_data_dynamic_frame_write"
+)
+
 glueContext.write_dynamic_frame.from_catalog(
-    frame=merged_df, database=db_name, table_name=merged_table_name
+    frame=combined_data_dynamic_frame_write,
+    database=news_database,
+    table_name=output_table_name,
+    format="parquet",  # Specify the format as Parquet
 )
 
-# Write the merged DynamicFrame to an S3 location
-output_s3_uri = "s3://news-data-bucket-assignment1-aloy/output/"
-glueContext.write_dynamic_frame.from_catalog(
-    frame=merged_df, database=db_name, table_name=output_s3_uri, format="parquet"
-)
-
-# Commit the job
 job.commit()
