@@ -41,10 +41,9 @@ For each article the attribute are as follows:
 
 ## Business question 3:
 
-**Business Question:** Can we have recommendations for categorizing articles? <br/>
+**Business Question:**  Can we identify what words are commonly used for headlines based on categories? <br/>
 **Target beneficiary:** Article authors
-**How does it help?** This helps article authors to understand the category of the article they are writing. This can help them to focus on the categories that are trending and produce more articles on those categories.
-
+**How does it help?** This helps article authors to understand what words are commonly used for headlines. This can help them to focus on the words that are commonly used for headlines based on categories and produce more articles with those words.
 ---
 
 ## How to set up the project

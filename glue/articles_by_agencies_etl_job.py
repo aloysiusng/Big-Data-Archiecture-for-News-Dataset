@@ -59,6 +59,12 @@ agg_data = agg_data.repartition(1)
 agg_data_dynamic_frame_write = DynamicFrame.fromDF(
     agg_data, glueContext, "agg_data_dynamic_frame_write"
 )
+glueContext.write_dynamic_frame.from_options(
+    frame=agg_data_dynamic_frame_write,
+    connection_type="s3",
+    connection_options={"path": output_s3_uri},
+    )
+
 
 glueContext.write_dynamic_frame.from_catalog(
     frame=agg_data_dynamic_frame_write,

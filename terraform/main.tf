@@ -17,10 +17,7 @@ resource "aws_s3_object" "news_dataset_object" {
   source       = data.local_file.news_dataset.filename
   content_type = "application/json"
 }
-# lambda bucket
-# resource "aws_s3_bucket" "lambda_bucket" {
-#   bucket = var.lambda_bucket_name
-# }
+
 # glue script bucket
 resource "aws_s3_bucket" "glue_scripts_bucket" {
   bucket = var.glue_scripts_bucket_name
@@ -102,19 +99,7 @@ resource "aws_lambda_function" "get_news_api" {
     }
   }
 }
-resource "aws_lambda_function_url" "test_live" {
-  function_name      = aws_lambda_function.get_news_api.function_name
-  authorization_type = "NONE"
 
-  cors {
-    allow_credentials = true
-    allow_origins     = ["*"]
-    allow_methods     = ["GET"]
-    allow_headers     = ["date", "keep-alive"]
-    expose_headers    = ["keep-alive", "date"]
-    max_age           = 86400
-  }
-}
 # lambda function logging
 resource "aws_cloudwatch_log_group" "get_news" {
   name              = "/aws/lambda/${aws_lambda_function.get_news_api.function_name}"
@@ -151,7 +136,7 @@ resource "aws_glue_crawler" "news_data_crawler" {
   database_name = aws_glue_catalog_database.news_database.name
   schedule      = "cron(20 0 * * ? *)" // Daily at 12:20 AM UTC
   s3_target {
-    path = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/input"
+    path = "s3://${aws_s3_bucket.news_data_bucket_is459.id}/input/"
   }
 
 }
@@ -204,7 +189,6 @@ resource "aws_glue_catalog_table" "combined_news_table" {
 }
 
 # glue jobs for etl ============ **saves to both s3 and glue catalog ========================================================================================
-# saves to news_database.articles_by_agencies and to s3://news-data-bucket-assignment1-aloy/output/articles_by_agencies/
 module "articles_by_agencies_etl_job" {
   source          = "./glue_jobs"
   job_name        = "articles_by_agencies_etl_job"
@@ -243,16 +227,6 @@ resource "aws_athena_workgroup" "huff_post_articles_nathena_workgroup" {
     }
   }
 }
-resource "aws_athena_workgroup" "category_wordcloud_nathena_workgroup" {
-  name = "category_wordcloud_athena_workgroup"
-  configuration {
-    enforce_workgroup_configuration    = true
-    publish_cloudwatch_metrics_enabled = true
-    result_configuration {
-      output_location = "s3://${aws_s3_bucket.news_data_bucket_is459.bucket}/athena/output/category_wordcloud/"
-    }
-  }
-}
 
 # athena query for articles by agencies  ->  ETL job already settled the aggregation
 resource "aws_athena_named_query" "articles_by_agencies_query" {
@@ -260,4 +234,10 @@ resource "aws_athena_named_query" "articles_by_agencies_query" {
   workgroup = aws_athena_workgroup.articles_by_agencies_athena_workgroup.id
   database  = aws_glue_catalog_database.news_database.name
   query     = "SELECT * FROM combined_news_table;"
+}
+resource "aws_athena_named_query" "top5_huff_post_articles_query" {
+  name      = "top5_huff_post_articles_query"
+  workgroup = aws_athena_workgroup.huff_post_articles_nathena_workgroup.id
+  database  = aws_glue_catalog_database.news_database.name
+  query     = "SELECT EXTRACT(YEAR FROM date) AS publication_year, category, COUNT(*) AS article_count FROM news_category_dataset_v3_json WHERE EXTRACT(YEAR FROM date) IS NOT NULL GROUP BY EXTRACT(YEAR FROM date), category ORDER BY publication_year DESC, article_count DESC LIMIT 5;"
 }
