@@ -41,15 +41,16 @@ For each article the attribute are as follows:
 
 ## Business question 3:
 
-**Business Question:**  Can we identify what words are commonly used for headlines based on categories? <br/>
+**Business Question:** Can we identify what words are commonly used for headlines based on categories? <br/>
 **Target beneficiary:** Article authors
 **How does it help?** This helps article authors to understand what words are commonly used for headlines. This can help them to focus on the words that are commonly used for headlines based on categories and produce more articles with those words.
+
 ---
 
 ## How to set up the project
 
 1. Clone the repository
-2. Under lambda/get_news directory, run `npm install`
+2. cd to `lambda/get_news directory`, and read the readme.md there before proceeding to the next step
 3. Under the terraform directory, place the terraform.tfvars file with the following content:
 
 ```
