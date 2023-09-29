@@ -243,6 +243,16 @@ resource "aws_athena_workgroup" "huff_post_articles_nathena_workgroup" {
     }
   }
 }
+resource "aws_athena_workgroup" "category_wordcloud_nathena_workgroup" {
+  name = "category_wordcloud_athena_workgroup"
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+    result_configuration {
+      output_location = "s3://${aws_s3_bucket.news_data_bucket_is459.bucket}/athena/output/category_wordcloud/"
+    }
+  }
+}
 
 # athena query for articles by agencies  ->  ETL job already settled the aggregation
 resource "aws_athena_named_query" "articles_by_agencies_query" {
