@@ -10,6 +10,10 @@ resource "aws_s3_object" "output" {
   bucket = aws_s3_bucket.news_data_bucket_is459.id
   key    = "output/"
 }
+resource "aws_s3_object" "athena" {
+  bucket = aws_s3_bucket.news_data_bucket_is459.id
+  key    = "athena/"
+}
 # place kaggle data inside input
 resource "aws_s3_object" "news_dataset_object" {
   bucket       = aws_s3_bucket.news_data_bucket_is459.id
