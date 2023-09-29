@@ -29,21 +29,23 @@ For each article the attribute are as follows:
 
 ## Business question 1:
 
-**Business Question:** Can we visualise the distribution of the top 5 categories of articles by year in HuffPost? <br/>
+**Business Question:** Can we visualize the distribution of the top 5 categories of articles by year in HuffPost? <br/>
 **Target beneficiary:** HuffPost<br/>
-**How does it help?** This helps HuffPost to understand the trend of the top 5 categories of articles by year. This can help them to focus on the categories that are trending and produce more articles on those categories.
-
+**How does it help?** This helps HuffPost to understand the trend of the top 5 categories of articles by year.
+This can help them to focus on the categories that are trending and produce more articles on those categories.
 ## Business question 2:
 
 **Business Question:** Can we visualize the number of articles produced each year by various news agencies?<br/>
 **Target beneficiary:** News Agencies<br/>
-**How does it help?** This helps news agencies to understand the trend of the number of articles produced each year. This can help them to focus on the years that have the highest number of articles produced and produce more articles in those years.
+**How does it help?** This helps news agencies to understand the trend of the number of articles produced each year.
+This can help them to focus on the years that have the highest number of articles produced and produce more articles in those years.
 
 ## Business question 3:
 
-**Business Question:** Can we identify what words are commonly used for headlines based on categories? <br/>
+**Business Question:** Can we identify what words are commonly used for headlines?  <br/>
 **Target beneficiary:** Article authors<br/>
-**How does it help?** This helps article authors to understand what words are commonly used for headlines. This can help them to focus on the words that are commonly used for headlines based on categories and produce more articles with those words.
+**How does it help?** This helps article authors to understand what words are commonly used for headlines.
+This can help them to spend less time thinking of a great headline and spend more time refining their article.
 
 ---
 
@@ -71,13 +73,42 @@ terraform apply
 ```
 
 4. Once the terraform is applied, the architecture will be created in AWS.
-   ![alt text](image.jpg)
+The pipelines are linked to the business questions.
+   ![AWS Architecture for all pipelines](data/Architecture_for_all_pipelines.png)
+
+### Other Details
+
+**Data Ingestion:**
+Batch (AWS Lambda)
+
+**Data Processing:**
+Batch (AWS Glue)
 
 **For the scheduled triggers:**
-
 - 1200 daily => lambda get_news
 - 1220 daily => glue crawler
 - 1240 daily => glue ETL job
+
+### Limitations
+The API key for News API is a free tier key, which means that it is limited to 100 requests per day.
+This means that the data ingestion is limited to 100 articles per day and it will not contain data for the past years.
+Will require a paid subscription to News API to get more data -> code prepared in /lambda/readme.md if subscribed to paid subscription
+
+### Points for improvement
+Suboptimal data ingestion of Kaggle Data Set through:
+1. Manual downloading of Kaggle dataset and uploading to S3
+2. Manual downloading of Kaggle dataset, replacing it in the code base and run `terraform apply`
+
+**Improvement:**
+Using EC2 or a Lambda function to automate this process in the future
+
+---
+
+# Learning Points
+1. Deeper understanding of big data pipelines
+2. Using Terraform for big data pipelines
+3. Using AWS Glue, Athena, QuickSight
+4. Exploring PySpark’s functions like ML & SQL
 
 ---
 
