@@ -32,15 +32,17 @@ variable "glue_scripts_bucket_name" {
   type    = string
   default = "glue-scripts-bucket-assignment1-aloy"
 }
-variable "athena_workgroup_name" {
-  type    = string
-  default = "athena-workgroup-assignment1-aloy"
-}
-variable "quicksight_data_source_name" {
-  type    = string
-  default = "quicksight-data-source-assignment1-aloy"
-}
+
 variable "articles_by_agencies_table_name" {
   type    = string
   default = "articles_by_agencies"
+}
+variable "huff_post_articles_table_name" {
+  type    = string
+  default = "huff_post_articles"
+}
+
+variable "kaggle_data_source_name" {
+  type    = string
+  default = "News_Category_Dataset_v3.json"
 }

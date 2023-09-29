@@ -13,7 +13,7 @@ resource "aws_s3_object" "output" {
 # place kaggle data inside input
 resource "aws_s3_object" "news_dataset_object" {
   bucket       = aws_s3_bucket.news_data_bucket_is459.id
-  key          = "input/News_Category_Dataset_v3.json"
+  key          = "input/${var.kaggle_data_source_name}"
   source       = data.local_file.news_dataset.filename
   content_type = "application/json"
 }
@@ -223,13 +223,23 @@ module "articles_by_agencies_etl_job" {
 # }
 
 # Athena====================================================================================================
-resource "aws_athena_workgroup" "athena_workgroup" {
-  name = var.athena_workgroup_name
+resource "aws_athena_workgroup" "articles_by_agencies_athena_workgroup" {
+  name = "${var.articles_by_agencies_table_name}_athena_workgroup"
   configuration {
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
     result_configuration {
-      output_location = "s3://${aws_s3_bucket.news_data_bucket_is459.bucket}/athena/output/articles_by_agencies/"
+      output_location = "s3://${aws_s3_bucket.news_data_bucket_is459.bucket}/athena/output/${var.articles_by_agencies_table_name}/"
+    }
+  }
+}
+resource "aws_athena_workgroup" "huff_post_articles_nathena_workgroup" {
+  name = "${var.huff_post_articles_table_name}_athena_workgroup"
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+    result_configuration {
+      output_location = "s3://${aws_s3_bucket.news_data_bucket_is459.bucket}/athena/output/${var.huff_post_articles_table_name}/"
     }
   }
 }
@@ -237,41 +247,7 @@ resource "aws_athena_workgroup" "athena_workgroup" {
 # athena query for articles by agencies  ->  ETL job already settled the aggregation
 resource "aws_athena_named_query" "articles_by_agencies_query" {
   name      = "articles_by_agencies_query"
-  workgroup = aws_athena_workgroup.athena_workgroup.id
+  workgroup = aws_athena_workgroup.articles_by_agencies_athena_workgroup.id
   database  = aws_glue_catalog_database.news_database.name
   query     = "SELECT * FROM combined_news_table;"
 }
-
-# quicksight====================================================================================================
-# resource "aws_quicksight_data_source" "quicksight_data_source" {
-#   name = var.quicksight_data_source_name
-#   type = "ATHENA"
-#   athena_parameters {
-#     work_group = "my-athena-workgroup"
-#   }
-# }
-
-# resource "aws_quicksight_dataset" "my_dataset" {
-#   name        = "my-dataset"
-#   data_source = aws_quicksight_data_source.my_data_source.arn
-
-#   # Define dataset schema and fields
-# }
-
-# resource "aws_quicksight_analysis" "my_analysis" {
-#   name        = "my-analysis"
-#   theme_arn   = aws_quicksight_theme.my_theme.arn
-#   data_source = aws_quicksight_data_source.my_data_source.arn
-
-#   # Define analysis structure
-# }
-
-# resource "aws_quicksight_dashboard" "my_dashboard" {
-#   name        = "my-dashboard"
-#   permissions = ["PUBLIC"]
-#   source_entity {
-#     source_template {
-#       arn = aws_quicksight_analysis.my_analysis.arn
-#     }
-#   }
-# }

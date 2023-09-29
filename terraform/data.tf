@@ -79,7 +79,5 @@ data "local_file" "articles_by_agencies_etl_job_py_file" {
 }
 
 data "local_file" "news_dataset" {
-  filename = "../data/News_Category_Dataset_v3.json"
+  filename = "../data/${var.kaggle_data_source_name}"
 }
-
-
